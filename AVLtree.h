@@ -50,7 +50,7 @@ public:
      * Usuwa całą strukturę drzewa AVL.
      */
     ~AVLTree() {
-        deleteTree();
+        root = nullptr;
     }
 
     /**
@@ -84,9 +84,8 @@ public:
     /**
      @brief Czyści całe drzewo AVL, usuwając wszystkie węzły.
      */
-    void clear() {
-        deleteTree();
-        root = nullptr;
+    static void clear() {
+        ~AVLTree();
     }
 
     /**
@@ -111,9 +110,11 @@ public:
      * @param value Wartość do dodania.
      * @return true, jeśli wstawienie się udało.
      */
-    bool insert(const T& value) {
-        root = insert(root, value);
-        return true;
+bool insert(const T& value) {
+    std::cout << "Inserting value: " << value << std::endl;
+    root = insert(root, value);
+    display();
+    return true;
     }
 
     /**
@@ -121,9 +122,12 @@ public:
      * @param value Wartość do usunięcia.
      * @return true, jeśli usunięcie się udało.
      */
-    bool remove(const T& value) {
-        root = remove(root, value);
-        return true;
+bool remove(const T& value) {
+    std::cout << "Removing value: " << value << std::endl;
+    root = remove(root, value);
+    std::cout << "Tree after removal:" << std::endl;
+    display();
+    return true;
     }
 
     /**
@@ -209,7 +213,7 @@ public:
 */
     int getBalanceFactor(const T& value) const {
         AVLNode<T>* node = search(root, value);
-        if (!node) throw std::runtime_error("Value not found in tree");
+        if (!node) throw std::runtime_error("Wartość nie została znaleziona w drzewie AVL");
         return balanceFactor(node);
     }
 
@@ -226,6 +230,12 @@ public:
         return isValid(root);
     }
 
+    void display() {
+        display(root, 0);
+        std::cout << std::endl;
+        std::cout << std::endl;
+    }
+
 private:
     /**
      * Wskaźnik do korzenia drzewa AVL.
@@ -237,8 +247,18 @@ private:
      * @param node Wskaźnik do węzła, którego wysokość jest obliczana.
      * @return Wysokość węzła lub 0, jeśli węzeł jest pusty.
      */
-    int height(AVLNode<T>* node) {
+    int height(AVLNode<T>* node) const {
         return node ? node->height : 0;
+    }
+
+    void display(AVLNode<T>* node, int level) {
+        if (node == nullptr) return;
+        display(node->right, level + 1);
+        for (int i = 0; i < level; i++) {
+            std::cout << "   |";
+        }
+        std::cout << "---" << node->value << std::endl;
+        display(node->left, level + 1);
     }
 
     /**
@@ -246,7 +266,7 @@ private:
      * @param node Wskaźnik do węzła, dla którego obliczany jest współczynnik równowagi.
      * @return Różnica wysokości lewego i prawego poddrzewa danego węzła.
      */
-    int balanceFactor(AVLNode<T>* node) {
+    int balanceFactor(AVLNode<T>* node) const {
         return node ? height(node->left) - height(node->right) : 0;
     }
 
@@ -254,7 +274,7 @@ private:
      * @brief Aktualizuje wysokość danego węzła na podstawie jego poddrzew.
      * @param node Wskaźnik do węzła, którego wysokość jest aktualizowana.
      */
-    void updateHeight(AVLNode<T>* node) {
+    void updateHeight(AVLNode<T>* node) const {
         if (node) {
             node->height = 1 + std::max(height(node->left), height(node->right));
         }
@@ -284,6 +304,7 @@ private:
      * @return Wskaźnik do nowego korzenia po rotacji.
      */
     AVLNode<T>* rotateLeft(AVLNode<T>* x) {
+
         AVLNode<T>* y = x->right;
         AVLNode<T>* T2 = y->left;
 
@@ -302,45 +323,59 @@ private:
      * @return Wskaźnik do potencjalnie nowego węzła po wyważeniu.
      */
     AVLNode<T>* rebalance(AVLNode<T>* node) {
-        updateHeight(node);
 
+        if (!node) return nullptr;
+        updateHeight(node);
         int balance = balanceFactor(node);
 
         if (balance > 1 && balanceFactor(node->left) >= 0) {
+            std::cout << "Right rotation at node: " << node->value << std::endl;
+            display();
             return rotateRight(node);
-        }
+                }
 
         if (balance > 1 && balanceFactor(node->left) < 0) {
+            std::cout << "Left rotation at node: " << node->left->value << " before right rotation" << std::endl;
+            display();
             node->left = rotateLeft(node->left);
+            std::cout << "Right rotation at node: " << node->value << std::endl;
+            display();
             return rotateRight(node);
-        }
+                }
 
         if (balance < -1 && balanceFactor(node->right) <= 0) {
+            display();
+            std::cout << "Left rotation at node: " << node->value << std::endl;
             return rotateLeft(node);
-        }
+                }
 
         if (balance < -1 && balanceFactor(node->right) > 0) {
+            std::cout << "Right rotation at node: " << node->right->value << " before left rotation" << std::endl;
+            display();
             node->right = rotateRight(node->right);
+            std::cout << "Left rotation at node: " << node->value << std::endl;
+            display();
             return rotateLeft(node);
+                }
+
+
+                return node;
         }
 
-        return node;
-    }
-
-/**
- * @brief Wstawia nową wartość do drzewa AVL.
- *
- * Metoda ta rekurencyjnie wstawia podaną wartość do drzewa AVL, zachowując
- * własność zrównoważenia drzewa. Wartość jest porównywana z bieżącymi
- * węzłami, aby znaleźć odpowiednie miejsce na jej wstawienie. W przypadku
- * naruszenia równowagi węzłów, wykonywane są operacje wyważania.
- *
- * @param node Wskaźnik do bieżącego węzła, od którego rozpoczyna się
- *             wyszukiwanie miejsca do wstawienia.
- * @param value Wartość do dodania do drzewa AVL.
- * @return Wskaźnik do potencjalnie nowego węzła po operacji wstawienia.
- */
-AVLNode<T>* insert(AVLNode<T>* node, const T& value) {
+    /**
+     * @brief Wstawia nową wartość do drzewa AVL.
+     *
+     * Metoda ta rekurencyjnie wstawia podaną wartość do drzewa AVL, zachowując
+     * własność zrównoważenia drzewa. Wartość jest porównywana z bieżącymi
+     * węzłami, aby znaleźć odpowiednie miejsce na jej wstawienie. W przypadku
+     * naruszenia równowagi węzłów, wykonywane są operacje wyważania.
+     *
+     * @param node Wskaźnik do bieżącego węzła, od którego rozpoczyna się
+     *             wyszukiwanie miejsca do wstawienia.
+     * @param value Wartość do dodania do drzewa AVL.
+     * @return Wskaźnik do potencjalnie nowego węzła po operacji wstawienia.
+     */
+    AVLNode<T>* insert(AVLNode<T>* node, const T& value) {
         if (!node) {
             return new AVLNode<T>(value);
         }
@@ -356,29 +391,29 @@ AVLNode<T>* insert(AVLNode<T>* node, const T& value) {
         return rebalance(node);
     }
 
-/**
- * @brief Znajduje węzeł z minimalną wartością w poddrzewie rozpoczętym od danego węzła.
- *
- * Metoda rekurencyjnie schodzi w lewo, aby znaleźć węzeł o minimalnej wartości.
- *
- * @param node Wskaźnik do węzła początkowego.
- * @return Wskaźnik do węzła przechowującego najmniejszą wartość.
- */
-AVLNode<T>* minValueNode(AVLNode<T>* node) const {
+    /**
+     * @brief Znajduje węzeł z minimalną wartością w poddrzewie rozpoczętym od danego węzła.
+     *
+     * Metoda rekurencyjnie schodzi w lewo, aby znaleźć węzeł o minimalnej wartości.
+     *
+     * @param node Wskaźnik do węzła początkowego.
+     * @return Wskaźnik do węzła przechowującego najmniejszą wartość.
+     */
+    AVLNode<T>* minValueNode(AVLNode<T>* node) const {
         AVLNode<T>* current = node;
         while (current && current->left) {
             current = current->left;
         }
         return current;
     }
-/**
- * @brief Znajduje węzeł z maksymalną wartością w poddrzewie rozpoczętym od danego węzła.
- *
- * Metoda rekurencyjnie schodzi w prawo, aby znaleźć węzeł o maksymalnej wartości.
- *
- * @param node Wskaźnik do węzła początkowego.
- * @return Wskaźnik do węzła przechowującego największą wartość.
- */
+    /**
+     * @brief Znajduje węzeł z maksymalną wartością w poddrzewie rozpoczętym od danego węzła.
+     *
+     * Metoda rekurencyjnie schodzi w prawo, aby znaleźć węzeł o maksymalnej wartości.
+     *
+     * @param node Wskaźnik do węzła początkowego.
+     * @return Wskaźnik do węzła przechowującego największą wartość.
+     */
     AVLNode<T>* maxValueNode(AVLNode<T>* node) const {
         AVLNode<T>* current = node;
         while (current && current->right) {
@@ -387,16 +422,16 @@ AVLNode<T>* minValueNode(AVLNode<T>* node) const {
         return current;
     }
 
-/**
- * @brief Usuwa węzeł z podaną wartością z drzewa AVL.
- *
- * Metoda usuwa węzeł zawierający podaną wartość, zachowując własność zrównoważenia drzewa AVL.
- *
- * @param node Wskaźnik do korzenia poddrzewa, w którym rozpoczęte jest usuwanie.
- * @param value Wartość do usunięcia.
- * @return Wskaźnik do potencjalnie nowego węzła po usunięciu.
- */
-AVLNode<T>* remove(AVLNode<T>* node, const T& value) {
+    /**
+     * @brief Usuwa węzeł z podaną wartością z drzewa AVL.
+     *
+     * Metoda usuwa węzeł zawierający podaną wartość, zachowując własność zrównoważenia drzewa AVL.
+     *
+     * @param node Wskaźnik do korzenia poddrzewa, w którym rozpoczęte jest usuwanie.
+     * @param value Wartość do usunięcia.
+     * @return Wskaźnik do potencjalnie nowego węzła po usunięciu.
+     */
+    AVLNode<T>* remove(AVLNode<T>* node, const T& value) {
         if (!node) {
             return node;
         }
@@ -424,6 +459,8 @@ AVLNode<T>* remove(AVLNode<T>* node, const T& value) {
             }
         }
 
+
+
         if (!node) {
             return node;
         }
@@ -431,50 +468,50 @@ AVLNode<T>* remove(AVLNode<T>* node, const T& value) {
         return rebalance(node);
     }
 
-/**
- * @brief Znajduje węzeł z minimalną wartością w poddrzewie.
- *
- * Metoda korzysta z funkcji pomocniczej minValueNode w celu określenia węzła
- * przechowującego najmniejszą wartość w danym poddrzewie.
- *
- * @param node Wskaźnik do poddrzewa, w którym zaczyna się poszukiwanie.
- * @return Wskaźnik do węzła z minimalną wartością.
- */
-AVLNode<T>* find_min(AVLNode<T>* node) const {
-        return minValueNode(node);
+    /**
+     * @brief Znajduje węzeł z minimalną wartością w poddrzewie.
+     *
+     * Metoda korzysta z funkcji pomocniczej minValueNode w celu określenia węzła
+     * przechowującego najmniejszą wartość w danym poddrzewie.
+     *
+     * @param node Wskaźnik do poddrzewa, w którym zaczyna się poszukiwanie.
+     * @return Wskaźnik do węzła z minimalną wartością.
+     */
+    AVLNode<T>* find_min(AVLNode<T>* node) const {
+            return minValueNode(node);
+        }
+
+    /**
+     * @brief Znajduje węzeł z maksymalną wartością w poddrzewie.
+     *
+     * Metoda korzysta z funkcji pomocniczej maxValueNode w celu określenia węzła
+     * przechowującego największą wartość w danym poddrzewie.
+     *
+     * @param node Wskaźnik do poddrzewa, w którym zaczyna się poszukiwanie.
+     * @return Wskaźnik do węzła z maksymalną wartością.
+     */
+    AVLNode<T>* find_max(AVLNode<T>* node) const {
+            return maxValueNode(node);
     }
 
-/**
- * @brief Znajduje węzeł z maksymalną wartością w poddrzewie.
- *
- * Metoda korzysta z funkcji pomocniczej maxValueNode w celu określenia węzła
- * przechowującego największą wartość w danym poddrzewie.
- *
- * @param node Wskaźnik do poddrzewa, w którym zaczyna się poszukiwanie.
- * @return Wskaźnik do węzła z maksymalną wartością.
- */
-AVLNode<T>* find_max(AVLNode<T>* node) const {
-        return maxValueNode(node);
-    }
-
-/**
- * @brief Wyszukuje węzeł z podaną wartością w drzewie AVL.
- *
- * Metoda rekurencyjna, która porównuje wartość w bieżącym węźle z wartościami w poddrzewach,
- * dopóki nie znajdzie danego węzła lub napotka pusty wskaźnik.
- *
- * @param node Wskaźnik do bieżącego węzła w czasie przeszukiwania.
- * @param value Wartość wyszukiwana.
- * @return Wskaźnik do węzła zawierającego podaną wartość; nullptr, jeśli nie znaleziono.
- */
-AVLNode<T>* search(AVLNode<T>* node, const T& value) const {
-        if (!node || node->value == value) {
-            return node;
-        }
-        if (value < node->value) {
-            return search(node->left, value);
-        }
-        return search(node->right, value);
+    /**
+     * @brief Wyszukuje węzeł z podaną wartością w drzewie AVL.
+     *
+     * Metoda rekurencyjna, która porównuje wartość w bieżącym węźle z wartościami w poddrzewach,
+     * dopóki nie znajdzie danego węzła lub napotka pusty wskaźnik.
+     *
+     * @param node Wskaźnik do bieżącego węzła w czasie przeszukiwania.
+     * @param value Wartość wyszukiwana.
+     * @return Wskaźnik do węzła zawierającego podaną wartość; nullptr, jeśli nie znaleziono.
+     */
+    AVLNode<T>* search(AVLNode<T>* node, const T& value) const {
+            if (!node || node->value == value) {
+                return node;
+            }
+            if (value < node->value) {
+                return search(node->left, value);
+            }
+            return search(node->right, value);
     }
 
    /**
@@ -520,15 +557,15 @@ AVLNode<T>* search(AVLNode<T>* node, const T& value) const {
     }
 
     /**
-        @brief Sprawdza, czy drzewo AVL jest poprawne.
+    @brief Sprawdza, czy drzewo AVL jest poprawne.
         
-        Metoda rekurencyjnie sprawdza, czy dane drzewo AVL spełnia zasady poprawności, tj.:
-        1. Współczynnik wyważenia każdego węzła mieści się w zakresie [-1, 1].
-        2. Lewa i prawa część poddrzewa również są poprawnymi drzewami AVL.
+    Metoda rekurencyjnie sprawdza, czy dane drzewo AVL spełnia zasady poprawności, tj.:
+    1. Współczynnik wyważenia każdego węzła mieści się w zakresie [-1, 1].
+    2. Lewa i prawa część poddrzewa również są poprawnymi drzewami AVL.
         
-        @param node Wskaźnik na węzeł drzewa, który ma zostać sprawdzony.
-        @return true, jeśli drzewo jest poprawne; false w przeciwnym razie.
-        */
+    @param node Wskaźnik na węzeł drzewa, który ma zostać sprawdzony.
+    @return true, jeśli drzewo jest poprawne; false w przeciwnym razie.
+    */
     bool isValid(AVLNode<T>* node) const {
 
         if (!node) return true; // Puste poddrzewo jest zawsze poprawne
@@ -543,34 +580,6 @@ AVLNode<T>* search(AVLNode<T>* node, const T& value) const {
 
         // Rekurencyjnie sprawdzaj poprawność lewego i prawego poddrzewa
         return isValid(node->left) && isValid(node->right);
-    }
-    
-
-   /**
-    * @brief Usuwa całe drzewo AVL, zwalniając używaną pamięć.
-    *
-    * Usuwa wszystkie węzły drzewa AVL, zaczynając od korzenia, dzięki czemu
-    * drzewo zostaje całkowicie wyczyszczone.
-    */
-    void deleteTree() {
-        deleteSubtree(root);
-        root = nullptr;
-    }
-
-   /**
-    * @brief Usuwa określone poddrzewo i zwalnia używaną pamięć.
-    *
-    * Metoda wykonuje rekursywne usuwanie węzłów należących do poddrzewa zaczynając
-    * od podanego węzła.
-    *
-    * @param node Wskaźnik na węzeł, od którego rozpoczyna się usuwanie.
-    */
-    void deleteSubtree(AVLNode<T>* node) {
-        if (node) {
-            deleteSubtree(node->left);
-            deleteSubtree(node->right);
-            delete node;
-        }
     }
 };
 
