@@ -107,10 +107,10 @@ AVLNode<T>* rebalance(AVLNode<T>* node) {
 ## **6. Złożoność algorytmów**
 
 ### **Złożoność czasowa:**
-- **Wstawianie, usuwanie, wyszukiwanie:** O(log n).
+- **Wstawianie, usuwanie, wyszukiwanie:** można wykonać z pesymistyczną złożonością czasową O(log n).
 
 ### **Złożoność pamięciowa:**
-- Drzewo AVL wymaga O(n) dodatkowej pamięci na wskaźniki i atrybuty.
+- Drzewo AVL wymaga O(n) dodatkowej pamięci na swoje atrybuty.
 
 ---
 
