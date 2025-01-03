@@ -81,7 +81,7 @@ public:
      */
     AVLTree& operator=(const AVLTree& other) {
         if (this != &other) {
-            // Usuń istniejące drzewo poprzez resetowanie
+            // Usuń istniejące drzewo
             while (root != nullptr) {
                 remove(root->value);
             }
@@ -98,8 +98,8 @@ public:
     /**
      @brief Czyści całe drzewo AVL, usuwając wszystkie węzły.
      */
-    static void clear() {
-        ~AVLTree();
+    void clear() {
+        root=nullptr;
     }
 
     /**
@@ -136,11 +136,11 @@ bool insert(const T& value) {
      * @param value Wartość do usunięcia.
      * @return true, jeśli usunięcie się udało.
      */
-bool remove(const T& value) {
-    std::cout << "Usunięto węzeł: " << value << std::endl;
-    root = remove(root, value);
-    display();
-    return true;
+    bool remove(const T& value) {
+        std::cout << "Usuwam węzeł: " << value << std::endl;
+        root = remove(root, value);
+        display();
+        return true;
     }
 
     /**
@@ -195,6 +195,18 @@ bool remove(const T& value) {
     }
 
     /**
+ * @brief Liczy liczbę węzłów w drzewie AVL.
+ *
+ * Metoda rekurencyjnie przechodzi przez wszystkie węzły drzewa i zlicza je.
+ *
+ * @return Liczba węzłów w drzewie.
+ */
+    int countNodes() const {
+        return countNodes(root);
+    }
+
+
+    /**
      * @brief Wykonuje przeszukiwanie drzewa AVL wszerz (BFS) i drukuje wartości.
      */
     void bfs() const {
@@ -247,6 +259,10 @@ bool remove(const T& value) {
         display(root, 0);
         std::cout << std::endl;
         std::cout << std::endl;
+    }
+
+    int getHeight() {
+        return height(root);
     }
 
 private:
@@ -447,6 +463,13 @@ private:
             return node;
         }
 
+        if (!search(value)) {
+            std::cout << "Nie znaleziono węzła: " << value << std::endl;
+            std::cout << "Nie można usunąć węzła, który nie istnieje!" << std::endl;
+            return node;
+        }
+
+
         if (value < node->value) {
             node->left = remove(node->left, value);
         } else if (value > node->value) {
@@ -470,11 +493,6 @@ private:
             }
         }
 
-
-
-        if (!node) {
-            return node;
-        }
 
         return rebalance(node);
     }
@@ -565,6 +583,16 @@ private:
             postorder(node->right);
             std::cout << node->value << " ";
         }
+    }
+
+    /**
+     * @brief Rekurencyjnie liczy węzły w danym poddrzewie.
+     * @param node Wskaźnik na korzeń poddrzewa.
+     * @return Liczba węzłów w poddrzewie.
+     */
+    int countNodes(AVLNode<T>* node) const {
+        if (!node) return 0;
+        return 1 + countNodes(node->left) + countNodes(node->right);
     }
 
     /**
