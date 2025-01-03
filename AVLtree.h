@@ -54,29 +54,43 @@ public:
     }
 
     /**
- * @brief Konstruktor kopiujący dla klasy AVLTree.
- *
- * Tworzy nową instancję drzewa AVL, będącą kopią innego drzewa AVL.
- *
- * @param other Obiekt AVLTree do skopiowania.
- */
+     * @brief Konstruktor kopiujący dla klasy AVLTree.
+     *
+     * Tworzy nową instancję drzewa AVL, będącą kopią innego drzewa AVL.
+     *
+     * @param other Obiekt AVLTree do skopiowania.
+     */
     AVLTree(const AVLTree &other) {
-        root = clone(other.root);
+        if (other.root == nullptr) {
+            root = nullptr;
+        } else {
+            root = new AVLNode<T>(other.root->value);
+            copyTree(root, other.root);
+        }
     }
 
     /**
-        * @brief Operator przypisania dla klasy AVLTree.
-        * Kopiuje strukturę innego drzewa AVL do bieżącego obiektu.
-        * @param other Obiekt AVLTree do skopiowania.
-        * @return Referencja do bieżącego obiektu AVLTree.
-        *
-        * Funkcja tworzy kopię drzewa AVL "other" i przypisuje ją do aktualnego drzewa.
-        * Sprawdza, czy bieżące drzewo i obiekt do skopiowania to różne instancje,
-        * aby uniknąć zbędnego przepisywania danych.
-        */
+     * @brief Operator przypisania dla klasy AVLTree.
+     * Kopiuje strukturę innego drzewa AVL do bieżącego obiektu.
+     * @param other Obiekt AVLTree do skopiowania.
+     * @return Referencja do bieżącego obiektu AVLTree.
+     *
+     * Funkcja tworzy kopię drzewa AVL "other" i przypisuje ją do aktualnego drzewa.
+     * Sprawdza, czy bieżące drzewo i obiekt do skopiowania to różne instancje,
+     * aby uniknąć zbędnego przepisywania danych.
+     */
     AVLTree& operator=(const AVLTree& other) {
         if (this != &other) {
-            root = clone(other.root);
+            // Usuń istniejące drzewo poprzez resetowanie
+            while (root != nullptr) {
+                remove(root->value);
+            }
+
+            // Skopiuj nowe drzewo
+            if (other.root != nullptr) {
+                root = new AVLNode<T>(other.root->value);
+                copyTree(root, other.root);
+            }
         }
         return *this;
     }
@@ -111,7 +125,7 @@ public:
      * @return true, jeśli wstawienie się udało.
      */
 bool insert(const T& value) {
-    std::cout << "Inserting value: " << value << std::endl;
+    std::cout << "Wstawiono węzeł: " << value << std::endl;
     root = insert(root, value);
     display();
     return true;
@@ -123,7 +137,7 @@ bool insert(const T& value) {
      * @return true, jeśli usunięcie się udało.
      */
 bool remove(const T& value) {
-    std::cout << "Removing value: " << value << std::endl;
+    std::cout << "Usunięto węzeł: " << value << std::endl;
     root = remove(root, value);
     display();
     return true;
@@ -288,7 +302,7 @@ private:
         AVLNode<T>* x = y->left;
         AVLNode<T>* T2 = x->right;
 
-        std::cout << "Right rotation at node: " << y->value << std::endl;
+        std::cout << "Rotacja w prawo węzła: " << y->value << std::endl;
         x->right = y;
         y->left = T2;
 
@@ -309,7 +323,7 @@ private:
         AVLNode<T>* y = x->right;
         AVLNode<T>* T2 = y->left;
 
-        std::cout << "Left rotation at node: " << x->value << std::endl;
+        std::cout << "Rotacja w lewo węzła: " << x->value << std::endl;
 
         y->left = x;
         x->right = T2;
@@ -578,6 +592,26 @@ private:
         // Rekurencyjnie sprawdzaj poprawność lewego i prawego poddrzewa
         return isValid(node->left) && isValid(node->right);
     }
+
+    /**
+     * @brief Kopiuje poddrzewo drzewa AVL.
+     *
+     * Funkcja rekurencyjnie kopiuje węzły drzewa.
+     * @param dest Wskaźnik na węzeł docelowy.
+     * @param src Wskaźnik na węzeł źródłowy.
+     */
+    void copyTree(AVLNode<T>*& dest, AVLNode<T>* src) {
+        if (src->left) {
+            dest->left = new AVLNode<T>(src->left->value);
+            copyTree(dest->left, src->left);
+        }
+        if (src->right) {
+            dest->right = new AVLNode<T>(src->right->value);
+            copyTree(dest->right, src->right);
+        }
+        dest->height = src->height;
+    }
+
 };
 
 #endif // AVLTREE_H
