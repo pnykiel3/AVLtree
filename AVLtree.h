@@ -125,7 +125,6 @@ bool insert(const T& value) {
 bool remove(const T& value) {
     std::cout << "Removing value: " << value << std::endl;
     root = remove(root, value);
-    std::cout << "Tree after removal:" << std::endl;
     display();
     return true;
     }
@@ -219,11 +218,11 @@ bool remove(const T& value) {
 
     /**
  * @brief Sprawdza, czy drzewo AVL jest poprawne.
- * 
+ *
  * Drzewo jest poprawne, jeśli spełnia poniższe warunki:
  * - Współczynnik wyważenia dla każdego węzła wynosi -1, 0 lub 1.
  * - Wszystkie poddrzewa są również poprawnymi drzewami AVL.
- * 
+ *
  * @return true, jeśli drzewo AVL jest poprawne; false w przeciwnym razie.
  */
     bool isValid() const {
@@ -289,11 +288,13 @@ private:
         AVLNode<T>* x = y->left;
         AVLNode<T>* T2 = x->right;
 
+        std::cout << "Right rotation at node: " << y->value << std::endl;
         x->right = y;
         y->left = T2;
 
         updateHeight(y);
         updateHeight(x);
+
 
         return x;
     }
@@ -307,6 +308,8 @@ private:
 
         AVLNode<T>* y = x->right;
         AVLNode<T>* T2 = y->left;
+
+        std::cout << "Left rotation at node: " << x->value << std::endl;
 
         y->left = x;
         x->right = T2;
@@ -329,31 +332,25 @@ private:
         int balance = balanceFactor(node);
 
         if (balance > 1 && balanceFactor(node->left) >= 0) {
-            std::cout << "Right rotation at node: " << node->value << std::endl;
             display();
             return rotateRight(node);
                 }
 
         if (balance > 1 && balanceFactor(node->left) < 0) {
-            std::cout << "Left rotation at node: " << node->left->value << " before right rotation" << std::endl;
             display();
             node->left = rotateLeft(node->left);
-            std::cout << "Right rotation at node: " << node->value << std::endl;
             display();
             return rotateRight(node);
                 }
 
         if (balance < -1 && balanceFactor(node->right) <= 0) {
             display();
-            std::cout << "Left rotation at node: " << node->value << std::endl;
             return rotateLeft(node);
                 }
 
         if (balance < -1 && balanceFactor(node->right) > 0) {
-            std::cout << "Right rotation at node: " << node->right->value << " before left rotation" << std::endl;
             display();
             node->right = rotateRight(node->right);
-            std::cout << "Left rotation at node: " << node->value << std::endl;
             display();
             return rotateLeft(node);
                 }
@@ -558,11 +555,11 @@ private:
 
     /**
     @brief Sprawdza, czy drzewo AVL jest poprawne.
-        
+
     Metoda rekurencyjnie sprawdza, czy dane drzewo AVL spełnia zasady poprawności, tj.:
     1. Współczynnik wyważenia każdego węzła mieści się w zakresie [-1, 1].
     2. Lewa i prawa część poddrzewa również są poprawnymi drzewami AVL.
-        
+
     @param node Wskaźnik na węzeł drzewa, który ma zostać sprawdzony.
     @return true, jeśli drzewo jest poprawne; false w przeciwnym razie.
     */
