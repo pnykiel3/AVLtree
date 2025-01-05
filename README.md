@@ -139,7 +139,8 @@ AVLNode<T>* rebalance(AVLNode<T>* node) {
 ---
 
 ## **8. Literatura**
-- Strona prof. Kapanowskiego: [ufkapano.github.io](https://ufkapano.github.io/)
-- [AVL Tree  Wikipedia](https://en.wikipedia.org/wiki/AVL_tree)
+Strona prof. Kapanowskiego: [ufkapano.github.io](https://ufkapano.github.io/) <br>
+oraz:
+- [AVL Tree Wikipedia](https://en.wikipedia.org/wiki/AVL_tree)
 - [Binary Search Tree Wikipedia](https://en.wikipedia.org/wiki/Binary_search_tree)
 - [Eduinf — Drzewa AVL](https://eduinf.waw.pl/inf/alg/001_search/0119.php)
