@@ -148,7 +148,9 @@ bool insert(const T& value) {
      * @return Najmniejsza wartość w drzewie AVL.
      */
     T find_min() const {
-        assert(root != nullptr);
+        if (!root) {
+            throw std::runtime_error("Drzewo jest puste. Nie można znaleźć wartości minimalnej.");
+        }
         return find_min(root)->value;
     }
 
@@ -157,7 +159,9 @@ bool insert(const T& value) {
      * @return Największa wartość w drzewie AVL.
      */
     T find_max() const {
-        assert(root != nullptr);
+        if (!root) {
+            throw std::runtime_error("Drzewo jest puste. Nie można znaleźć wartości maksymalnej.");
+        }
         return find_max(root)->value;
     }
 
@@ -459,9 +463,10 @@ private:
      * @return Wskaźnik do potencjalnie nowego węzła po usunięciu.
      */
     AVLNode<T>* remove(AVLNode<T>* node, const T& value) {
-        if (!node) {
-            return node;
+        if (!root) {
+            throw std::runtime_error("Drzewo jest puste. Nie można wykonać remove().");
         }
+
 
         if (!search(value)) {
             std::cout << "Nie znaleziono węzła: " << value << std::endl;

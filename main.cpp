@@ -200,8 +200,41 @@ void test6() {
 
     int balance = tree.getBalanceFactor(10);
     assert(balance == 0);
-
 }
+
+void test7() {
+    //Edge Cases
+    AVLTree<int> tree;
+
+    // Test na pustym drzewie
+    try {
+        tree.find_min();
+        assert(false); // Powinno rzucić wyjątek
+    } catch (const std::runtime_error&) {
+        // Oczekiwany wyjątek
+    }
+
+    try {
+        tree.find_max();
+        assert(false); // Powinno rzucić wyjątek
+    } catch (const std::runtime_error&) {
+        // Oczekiwany wyjątek
+    }
+
+    try {
+        tree.remove(10);
+        assert(false); // Powinno rzucić wyjątek
+    } catch (const std::runtime_error&) {
+        // Oczekiwany wyjątek
+    }
+
+    tree.insert(15);
+    assert(tree.find_min() == 15);
+    assert(tree.find_max() == 15);
+    tree.remove(15);
+    assert(tree.isValid());
+}
+
 int main() {
     test1();
     test2();
@@ -209,6 +242,7 @@ int main() {
     test4();
     test5();
     test6();
+    test7();
 
     std::cout << "Wszystkie testy zostały zaliczone!" << std::endl;
     return 0;
