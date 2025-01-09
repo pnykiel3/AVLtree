@@ -4,6 +4,7 @@
 
 
 void test1() {
+    std::cout << "\033[33m====================  TEST 1 ====================\033[0m" << std::endl;
     AVLTree<int> tree;
 
     // Test wstawiania i balansowania (wszystkie przypadki rotacji)
@@ -96,6 +97,7 @@ void test1() {
 
 
 void test2() {
+    std::cout << "\033[33m====================  TEST 2 ====================\033[0m" << std::endl;
     AVLTree<int> tree;
 
     // Test LL
@@ -120,6 +122,93 @@ void test2() {
 }
 
 void test3() {
+    std::cout << "\033[33m====================  TEST 3 ====================\033[0m" << std::endl;
+    AVLTree<int> tree;
+
+    tree.insert(10);
+    tree.insert(20);
+    tree.insert(5);
+
+    assert(tree.find_min() == 5);
+    assert(tree.find_max() == 20);
+}
+
+void test4() {
+    std::cout << "\033[33m====================  TEST 4 ====================\033[0m" << std::endl;
+    AVLTree<int> tree;
+    for (int i = 1; i <= 15; ++i) {
+        tree.insert(i);
+    }
+
+    assert(tree.countNodes() == 15);
+    assert(tree.getHeight() == 4);
+
+    tree.clear();
+    assert(tree.empty());
+
+    tree.insert(10);
+    tree.insert(20);
+    tree.insert(5);
+
+    int balance = tree.getBalanceFactor(10);
+    assert(balance == 0);
+}
+
+void test5() {
+    std::cout << "\033[33m====================  TEST 5 ====================\033[0m" << std::endl;
+    //Edge Cases
+    AVLTree<int> tree;
+
+    // Test na pustym drzewie
+    try {
+        tree.find_min();
+        assert(false); // Powinno rzucić wyjątek
+    } catch (const std::runtime_error&) {
+        // Oczekiwany wyjątek
+    }
+
+    try {
+        tree.find_max();
+        assert(false); // Powinno rzucić wyjątek
+    } catch (const std::runtime_error&) {
+        // Oczekiwany wyjątek
+    }
+
+    try {
+        tree.remove(10);
+        assert(false); // Powinno rzucić wyjątek
+    } catch (const std::runtime_error&) {
+        // Oczekiwany wyjątek
+    }
+
+    tree.insert(15);
+    assert(tree.find_min() == 15);
+    assert(tree.find_max() == 15);
+    tree.remove(15);
+    assert(tree.isValid());
+}
+
+void test6() {
+    std::cout << "\033[33m====================  TEST 6 ====================\033[0m" << std::endl;
+    AVLTree<int> tree1;
+    tree1.insert(10);
+    tree1.insert(20);
+    tree1.insert(5);
+
+    // Test copy constructor
+    AVLTree<int> tree2(tree1);
+    assert(tree2.find_min() == 5);
+    assert(tree2.find_max() == 20);
+
+    // Test = operator
+    AVLTree<int> tree3;
+    tree3 = tree1;
+    assert(tree3.find_min() == 5);
+    assert(tree3.find_max() == 20);
+}
+
+void test7() {
+    std::cout << "\033[33m====================  TEST 7 ====================\033[0m" << std::endl;
     AVLTree<int> tree;
 
     tree.insert(20);
@@ -153,88 +242,6 @@ void test3() {
     assert(tree.isValid());
 }
 
-void test4() {
-    AVLTree<int> tree;
-
-    tree.insert(10);
-    tree.insert(20);
-    tree.insert(5);
-
-    assert(tree.find_min() == 5);
-    assert(tree.find_max() == 20);
-}
-
-void test5() {
-    AVLTree<int> tree1;
-    tree1.insert(10);
-    tree1.insert(20);
-    tree1.insert(5);
-
-    // Test copy constructor
-    AVLTree<int> tree2(tree1);
-    assert(tree2.find_min() == 5);
-    assert(tree2.find_max() == 20);
-
-    // Test = operator
-    AVLTree<int> tree3;
-    tree3 = tree1;
-    assert(tree3.find_min() == 5);
-    assert(tree3.find_max() == 20);
-}
-
-void test6() {
-    AVLTree<int> tree;
-    for (int i = 1; i <= 15; ++i) {
-        tree.insert(i);
-    }
-
-    assert(tree.countNodes() == 15);
-    assert(tree.getHeight() == 4);
-
-    tree.clear();
-    assert(tree.empty());
-
-    tree.insert(10);
-    tree.insert(20);
-    tree.insert(5);
-
-    int balance = tree.getBalanceFactor(10);
-    assert(balance == 0);
-}
-
-void test7() {
-    //Edge Cases
-    AVLTree<int> tree;
-
-    // Test na pustym drzewie
-    try {
-        tree.find_min();
-        assert(false); // Powinno rzucić wyjątek
-    } catch (const std::runtime_error&) {
-        // Oczekiwany wyjątek
-    }
-
-    try {
-        tree.find_max();
-        assert(false); // Powinno rzucić wyjątek
-    } catch (const std::runtime_error&) {
-        // Oczekiwany wyjątek
-    }
-
-    try {
-        tree.remove(10);
-        assert(false); // Powinno rzucić wyjątek
-    } catch (const std::runtime_error&) {
-        // Oczekiwany wyjątek
-    }
-
-    tree.insert(15);
-    assert(tree.find_min() == 15);
-    assert(tree.find_max() == 15);
-    tree.remove(15);
-    assert(tree.isValid());
-}
-
 int main() {
     test1();
     test2();
@@ -244,6 +251,6 @@ int main() {
     test6();
     test7();
 
-    std::cout << "Wszystkie testy zostały zaliczone!" << std::endl;
+    std::cout << "\033[32mWszystkie testy zostały zaliczone!\033[0m" << std::endl;
     return 0;
 }

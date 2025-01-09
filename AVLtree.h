@@ -124,11 +124,11 @@ public:
      * @param value Wartość do dodania.
      * @return true, jeśli wstawienie się udało.
      */
-bool insert(const T& value) {
-    std::cout << "Wstawiono węzeł: " << value << std::endl;
-    root = insert(root, value);
-    display();
-    return true;
+    bool insert(const T& value) {
+        std::cout << "Wstawiono węzeł: " << value << std::endl;
+        root = insert(root, value);
+        display();
+        return true;
     }
 
     /**
@@ -151,7 +151,7 @@ bool insert(const T& value) {
         if (!root) {
             throw std::runtime_error("Drzewo jest puste. Nie można znaleźć wartości minimalnej.");
         }
-        return find_min(root)->value;
+        return minValueNode(root)->value;
     }
 
     /**
@@ -162,7 +162,7 @@ bool insert(const T& value) {
         if (!root) {
             throw std::runtime_error("Drzewo jest puste. Nie można znaleźć wartości maksymalnej.");
         }
-        return find_max(root)->value;
+        return maxValueNode(root)->value;
     }
 
     /**
@@ -199,12 +199,12 @@ bool insert(const T& value) {
     }
 
     /**
- * @brief Liczy liczbę węzłów w drzewie AVL.
- *
- * Metoda rekurencyjnie przechodzi przez wszystkie węzły drzewa i zlicza je.
- *
- * @return Liczba węzłów w drzewie.
- */
+     * @brief Liczy liczbę węzłów w drzewie AVL.
+     *
+     * Metoda rekurencyjnie przechodzi przez wszystkie węzły drzewa i zlicza je.
+     *
+     * @return Liczba węzłów w drzewie.
+     */
     int countNodes() const {
         return countNodes(root);
     }
@@ -228,18 +228,18 @@ bool insert(const T& value) {
     }
 
     /**
-* @brief Pobiera współczynnik równowagi dla węzła zawierającego podaną wartość w drzewie AVL.
-*
-* Współczynnik równowagi obliczany jest jako różnica wysokości lewego i prawego poddrzewa
-* danego węzła. Pozytywny współczynnik oznacza, że lewe poddrzewo jest wyższe, negatywny
-* współczynnik oznacza, że prawe poddrzewo jest wyższe, a współczynnik równy zero oznacza,
-* że oba poddrzewa mają tę samą wysokość.
-*
-* @tparam T Typ danych przechowywanych w węzłach drzewa AVL.
-* @param value Wartość, której węzeł ma zostać odnaleziony w drzewie AVL.
-* @return Współczynnik równowagi dla węzła zawierającego podaną wartość.
-* @throws std::runtime_error Jeśli wartość nie zostanie znaleziona w drzewie AVL.
-*/
+    * @brief Pobiera współczynnik równowagi dla węzła zawierającego podaną wartość w drzewie AVL.
+    *
+    * Współczynnik równowagi obliczany jest jako różnica wysokości lewego i prawego poddrzewa
+    * danego węzła. Pozytywny współczynnik oznacza, że lewe poddrzewo jest wyższe, negatywny
+    * współczynnik oznacza, że prawe poddrzewo jest wyższe, a współczynnik równy zero oznacza,
+    * że oba poddrzewa mają tę samą wysokość.
+    *
+    * @tparam T Typ danych przechowywanych w węzłach drzewa AVL.
+    * @param value Wartość, której węzeł ma zostać odnaleziony w drzewie AVL.
+    * @return Współczynnik równowagi dla węzła zawierającego podaną wartość.
+    * @throws std::runtime_error Jeśli wartość nie zostanie znaleziona w drzewie AVL.
+    */
     int getBalanceFactor(const T& value) const {
         AVLNode<T>* node = search(root, value);
         if (!node) throw std::runtime_error("Wartość nie została znaleziona w drzewie AVL");
@@ -247,24 +247,33 @@ bool insert(const T& value) {
     }
 
     /**
- * @brief Sprawdza, czy drzewo AVL jest poprawne.
- *
- * Drzewo jest poprawne, jeśli spełnia poniższe warunki:
- * - Współczynnik wyważenia dla każdego węzła wynosi -1, 0 lub 1.
- * - Wszystkie poddrzewa są również poprawnymi drzewami AVL.
- *
- * @return true, jeśli drzewo AVL jest poprawne; false w przeciwnym razie.
- */
+     * @brief Sprawdza, czy drzewo AVL jest poprawne.
+     *
+     * Drzewo jest poprawne, jeśli spełnia poniższe warunki:
+     * - Współczynnik wyważenia dla każdego węzła wynosi -1, 0 lub 1.
+     * - Wszystkie poddrzewa są również poprawnymi drzewami AVL.
+     *
+     * @return true, jeśli drzewo AVL jest poprawne; false w przeciwnym razie.
+     */
     bool isValid() const {
         return isValid(root);
     }
 
+
+    /**
+     * @brief Wyświetla drzewo AVL w formie graficznej w terminalu.
+     */
     void display() {
         display(root, 0);
         std::cout << std::endl;
         std::cout << std::endl;
     }
 
+    /**
+     * @brief Oblicza wysokość drzewa AVL.
+     *
+     * @return Wysokość drzewa AVL.
+     */
     int getHeight() {
         return height(root);
     }
@@ -276,7 +285,7 @@ private:
     AVLNode<T>* root;
 
     /**
-     * @brief Zwraca wysokość danego węzła w drzewie AVL.
+     * @brief Oblicza wysokość danego węzła w drzewie AVL.
      * @param node Wskaźnik do węzła, którego wysokość jest obliczana.
      * @return Wysokość węzła lub 0, jeśli węzeł jest pusty.
      */
@@ -284,6 +293,9 @@ private:
         return node ? node->height : 0;
     }
 
+    /**
+     * @brief Wyświetla drzewo AVL w formie graficznej w terminalu.
+     */
     void display(AVLNode<T>* node, int level) {
         if (node == nullptr) return;
         display(node->right, level + 1);
@@ -502,31 +514,6 @@ private:
         return rebalance(node);
     }
 
-    /**
-     * @brief Znajduje węzeł z minimalną wartością w poddrzewie.
-     *
-     * Metoda korzysta z funkcji pomocniczej minValueNode w celu określenia węzła
-     * przechowującego najmniejszą wartość w danym poddrzewie.
-     *
-     * @param node Wskaźnik do poddrzewa, w którym zaczyna się poszukiwanie.
-     * @return Wskaźnik do węzła z minimalną wartością.
-     */
-    AVLNode<T>* find_min(AVLNode<T>* node) const {
-            return minValueNode(node);
-        }
-
-    /**
-     * @brief Znajduje węzeł z maksymalną wartością w poddrzewie.
-     *
-     * Metoda korzysta z funkcji pomocniczej maxValueNode w celu określenia węzła
-     * przechowującego największą wartość w danym poddrzewie.
-     *
-     * @param node Wskaźnik do poddrzewa, w którym zaczyna się poszukiwanie.
-     * @return Wskaźnik do węzła z maksymalną wartością.
-     */
-    AVLNode<T>* find_max(AVLNode<T>* node) const {
-            return maxValueNode(node);
-    }
 
     /**
      * @brief Wyszukuje węzeł z podaną wartością w drzewie AVL.
@@ -630,19 +617,19 @@ private:
      * @brief Kopiuje poddrzewo drzewa AVL.
      *
      * Funkcja rekurencyjnie kopiuje węzły drzewa.
-     * @param dest Wskaźnik na węzeł docelowy.
-     * @param src Wskaźnik na węzeł źródłowy.
+     * @param newT Wskaźnik na węzeł docelowy.
+     * @param oldT Wskaźnik na węzeł źródłowy.
      */
-    void copyTree(AVLNode<T>*& dest, AVLNode<T>* src) {
-        if (src->left) {
-            dest->left = new AVLNode<T>(src->left->value);
-            copyTree(dest->left, src->left);
+    void copyTree(AVLNode<T>*& newT, AVLNode<T>* oldT) {
+        if (oldT->left) {
+            newT->left = new AVLNode<T>(oldT->left->value);
+            copyTree(newT->left, oldT->left);
         }
-        if (src->right) {
-            dest->right = new AVLNode<T>(src->right->value);
-            copyTree(dest->right, src->right);
+        if (oldT->right) {
+            newT->right = new AVLNode<T>(oldT->right->value);
+            copyTree(newT->right, oldT->right);
         }
-        dest->height = src->height;
+        newT->height = oldT->height;
     }
 
 };

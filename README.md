@@ -140,6 +140,8 @@ AVLNode<T>* rebalance(AVLNode<T>* node) {
 
 ## **8. Literatura**
 Strona prof. Kapanowskiego: [ufkapano.github.io](https://ufkapano.github.io/) <br>
+(Podstawowy kod drzewa został zaczerpnięty właśnie z tej strony)
+<br>
 oraz:
 - [AVL Tree Wikipedia](https://en.wikipedia.org/wiki/AVL_tree)
 - [Binary Search Tree Wikipedia](https://en.wikipedia.org/wiki/Binary_search_tree)
