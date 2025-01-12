@@ -122,24 +122,26 @@ public:
     /**
      * @brief Wstawia nową wartość do drzewa AVL.
      * @param value Wartość do dodania.
+     * @param debug Czy wyświtlać drzewo po każdym kroku.
      * @return true, jeśli wstawienie się udało.
      */
-    bool insert(const T& value) {
-        std::cout << "Wstawiono węzeł: " << value << std::endl;
-        root = insert(root, value);
-        display();
+    bool insert(const T& value, bool debug = false) {
+        if (debug) std::cout << "Wstawiono węzeł: " << value << std::endl;
+        root = insert(root, value, debug);
+        if (debug) display();
         return true;
     }
 
     /**
      * @brief Usuwa wartość z drzewa AVL.
      * @param value Wartość do usunięcia.
+     * @param debug Czy wyświtlać drzewo po każdym kroku.
      * @return true, jeśli usunięcie się udało.
      */
-    bool remove(const T& value) {
-        std::cout << "Usuwam węzeł: " << value << std::endl;
-        root = remove(root, value);
-        display();
+    bool remove(const T& value, bool debug = false) {
+        if (debug) std::cout << "Usuwam węzeł: " << value << std::endl;
+        root = remove(root, value, debug);
+        if (debug) display();
         return true;
     }
 
@@ -328,13 +330,14 @@ private:
     /**
      * @brief Wykonuje rotację w prawo na danym węźle.
      * @param y Wskaźnik do węzła, na którym wykonywana jest operacja rotacji.
+     * @param debug Czy wyświetlać komunikat o rotacji.
      * @return Wskaźnik do nowego korzenia po rotacji.
      */
-    AVLNode<T>* rotateRight(AVLNode<T>* y) {
+    AVLNode<T>* rotateRight(AVLNode<T>* y, bool debug = false) {
         AVLNode<T>* x = y->left;
         AVLNode<T>* T2 = x->right;
 
-        std::cout << "Rotacja w prawo węzła: " << y->value << std::endl;
+        if (debug) std::cout << "Rotacja w prawo węzła: " << y->value << std::endl;
         x->right = y;
         y->left = T2;
 
@@ -348,14 +351,15 @@ private:
     /**
      * @brief Wykonuje rotację w lewo na danym węźle.
      * @param x Wskaźnik do węzła, na którym wykonywana jest operacja rotacji.
+     * @param debug Czy wyświetlać komunikat o rotacji.
      * @return Wskaźnik do nowego korzenia po rotacji.
      */
-    AVLNode<T>* rotateLeft(AVLNode<T>* x) {
+    AVLNode<T>* rotateLeft(AVLNode<T>* x, bool debug = false) {
 
         AVLNode<T>* y = x->right;
         AVLNode<T>* T2 = y->left;
 
-        std::cout << "Rotacja w lewo węzła: " << x->value << std::endl;
+        if (debug) std::cout << "Rotacja w lewo węzła: " << x->value << std::endl;
 
         y->left = x;
         x->right = T2;
@@ -369,36 +373,37 @@ private:
     /**
      * @brief Wykonuje operację wyważania (rebalansowania) danego węzła w drzewie AVL.
      * @param node Wskaźnik do węzła, który ma zostać zbalansowany.
+     * @param debug Czy wyświetlać drzewo po każdym kroku.
      * @return Wskaźnik do potencjalnie nowego węzła po wyważeniu.
      */
-    AVLNode<T>* rebalance(AVLNode<T>* node) {
+    AVLNode<T>* rebalance(AVLNode<T>* node, bool debug = false) {
 
         if (!node) return nullptr;
         updateHeight(node);
         int balance = balanceFactor(node);
 
         if (balance > 1 && balanceFactor(node->left) >= 0) {
-            display();
-            return rotateRight(node);
+            if (debug) display();
+            return rotateRight(node, debug);
                 }
 
         if (balance > 1 && balanceFactor(node->left) < 0) {
-            display();
-            node->left = rotateLeft(node->left);
-            display();
-            return rotateRight(node);
+            if (debug) display();
+            node->left = rotateLeft(node->left, debug);
+            if (debug) display();
+            return rotateRight(node, debug);
                 }
 
         if (balance < -1 && balanceFactor(node->right) <= 0) {
-            display();
-            return rotateLeft(node);
+            if (debug) display();
+            return rotateLeft(node, debug);
                 }
 
         if (balance < -1 && balanceFactor(node->right) > 0) {
-            display();
-            node->right = rotateRight(node->right);
-            display();
-            return rotateLeft(node);
+            if (debug) display();
+            node->right = rotateRight(node->right, debug);
+            if (debug) display();
+            return rotateLeft(node, debug);
                 }
 
 
@@ -416,22 +421,23 @@ private:
      * @param node Wskaźnik do bieżącego węzła, od którego rozpoczyna się
      *             wyszukiwanie miejsca do wstawienia.
      * @param value Wartość do dodania do drzewa AVL.
+     * @param debug Czy wyświetlać drzewo po każdym kroku.
      * @return Wskaźnik do potencjalnie nowego węzła po operacji wstawienia.
      */
-    AVLNode<T>* insert(AVLNode<T>* node, const T& value) {
+    AVLNode<T>* insert(AVLNode<T>* node, const T& value, bool debug = false) {
         if (!node) {
             return new AVLNode<T>(value);
         }
 
         if (value < node->value) {
-            node->left = insert(node->left, value);
+            node->left = insert(node->left, value, debug);
         } else if (value > node->value) {
-            node->right = insert(node->right, value);
+            node->right = insert(node->right, value, debug);
         } else {
             return node;
         }
 
-        return rebalance(node);
+        return rebalance(node, debug);
     }
 
     /**
@@ -472,9 +478,10 @@ private:
      *
      * @param node Wskaźnik do korzenia poddrzewa, w którym rozpoczęte jest usuwanie.
      * @param value Wartość do usunięcia.
+     * @param debug Czy wyświetlać drzewo po każdym kroku.
      * @return Wskaźnik do potencjalnie nowego węzła po usunięciu.
      */
-    AVLNode<T>* remove(AVLNode<T>* node, const T& value) {
+    AVLNode<T>* remove(AVLNode<T>* node, const T& value, bool debug = false) {
         if (!root) {
             throw std::runtime_error("Drzewo jest puste. Nie można wykonać remove().");
         }
@@ -488,9 +495,9 @@ private:
 
 
         if (value < node->value) {
-            node->left = remove(node->left, value);
+            node->left = remove(node->left, value, debug);
         } else if (value > node->value) {
-            node->right = remove(node->right, value);
+            node->right = remove(node->right, value, debug);
         } else {
             if (!node->left || !node->right) {
                 AVLNode<T>* temp = node->left ? node->left : node->right;
@@ -506,12 +513,12 @@ private:
             } else {
                 AVLNode<T>* temp = minValueNode(node->right);
                 node->value = temp->value;
-                node->right = remove(node->right, temp->value);
+                node->right = remove(node->right, temp->value, debug);
             }
         }
 
 
-        return rebalance(node);
+        return rebalance(node, debug);
     }
 
 
